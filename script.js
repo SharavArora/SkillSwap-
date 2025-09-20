@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
     auth.signOut().catch(err => console.error(err));
   });
 
-  // Auth state change
+  // Auth state listener
   auth.onAuthStateChanged(user => {
     if (user) {
       loginBtn.style.display = "none";
