@@ -22,6 +22,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const skillInput = document.getElementById("skill-input");
   const descInput = document.getElementById("desc-input");
   const postsContainer = document.getElementById("posts-container");
+  const searchInput = document.getElementById("search-input");
+
+  let postsData = [];
 
   // Login / Logout
   loginBtn.addEventListener("click", () => {
@@ -51,16 +54,19 @@ document.addEventListener("DOMContentLoaded", () => {
     const skill = skillInput.value.trim();
     const description = descInput.value.trim();
     const user = auth.currentUser;
-    if (!skill || !description) return alert("Fill both fields!");
-    if (!user) return alert("You must be logged in!");
 
-    db.ref("posts").push({
+    if (!skill || !description) return alert("Please fill both fields.");
+    if (!user) return alert("You must be signed in!");
+
+    const newPost = {
       skill,
       description,
       userId: user.uid,
       userName: user.displayName,
       timestamp: Date.now()
-    });
+    };
+
+    db.ref("posts").push(newPost);
 
     skillInput.value = "";
     descInput.value = "";
@@ -68,13 +74,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Real-time posts listener
   db.ref("posts").orderByChild("timestamp").on("value", snapshot => {
+    postsData = [];
+    snapshot.forEach(child => postsData.push(child.val()));
+    renderPosts(postsData);
+  });
+
+  // Render posts function
+  function renderPosts(posts) {
     postsContainer.innerHTML = "";
-    snapshot.forEach(child => {
-      const post = child.val();
+    posts.slice().reverse().forEach(post => {
       const div = document.createElement("div");
       div.className = "post";
       div.innerHTML = `<strong>${post.skill}</strong><br>${post.description}<br><small>by ${post.userName}</small>`;
-      postsContainer.prepend(div);
+      postsContainer.appendChild(div);
     });
+  }
+
+  // Search functionality
+  searchInput.addEventListener("input", () => {
+    const query = searchInput.value.toLowerCase();
+    const filtered = postsData.filter(post =>
+      post.skill.toLowerCase().includes(query) ||
+      post.description.toLowerCase().includes(query)
+    );
+    renderPosts(filtered);
   });
 });
