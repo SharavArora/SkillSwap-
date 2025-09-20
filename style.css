@@ -1,73 +1,63 @@
-/* Reset */
 * { margin:0; padding:0; box-sizing:border-box; }
 body {
-  font-family: 'Courier New', Courier, monospace;
-  background: radial-gradient(circle at top left, #0f0f0f, #111827);
-  color: #00ffea;
-  display: flex; justify-content: center; padding: 30px 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: #0d1117;
+  color: #00f0ff;
+  display: flex;
+  justify-content: center;
+  padding: 30px 0;
 }
 
-/* Container */
 .container {
   width: 100%;
-  max-width: 800px;
+  max-width: 700px;
   padding: 30px;
   border-radius: 15px;
   background: rgba(0,0,0,0.85);
-  box-shadow: 0 0 40px rgba(0,255,234,0.6);
-  backdrop-filter: blur(8px);
+  box-shadow: 0 0 40px rgba(0,255,240,0.5);
 }
 
-/* Headings */
-h1 { text-align:center; font-size:2.5em; margin-bottom:20px; color:#00ffea; text-shadow:0 0 10px #00ffea;}
-h2 { text-align:center; margin:25px 0 15px; color:#00ffea; text-shadow:0 0 8px #00ffd0; }
+h1 { text-align:center; font-size:2.2em; margin-bottom:20px; }
+h2 { text-align:center; margin:25px 0 15px; }
 
-/* Auth & Post Form */
 input {
-  padding: 12px 15px;
+  padding: 12px;
   border-radius: 8px;
-  border: 1px solid #00ffea;
-  background: rgba(0,0,0,0.4);
-  color: #00ffea;
-  font-size:1em;
+  border: 1px solid #00f0ff;
+  background: rgba(0,0,0,0.5);
+  color: #00f0ff;
+  width:100%;
+  margin-bottom:10px;
   outline:none;
-  transition:0.3s;
+  transition:0.2s;
 }
-input::placeholder { color:#00ffe0; }
-input:focus { background: rgba(0,0,0,0.6); box-shadow:0 0 15px #00ffea; }
+input:focus { background: rgba(0,0,0,0.7); box-shadow: 0 0 10px #00f0ff; }
 
 button {
   padding: 12px;
-  border-radius: 12px;
-  border: none;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 1em;
-  transition:0.3s;
-  background: linear-gradient(45deg, #00ffea, #00cfff);
-  color:#0f0f0f;
+  border-radius: 10px;
+  border:none;
+  background: linear-gradient(45deg,#00f0ff,#00c0ff);
+  color:#0d1117;
+  cursor:pointer;
+  font-weight:600;
+  width:100%;
+  transition:0.2s;
 }
-button:hover { box-shadow: 0 0 15px #00ffea; transform: translateY(-2px); }
+button:hover { box-shadow:0 0 15px #00f0ff; transform: translateY(-2px); }
 
-/* Forms layout */
-.auth-container, .post-form, .search-container {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-.auth-buttons { display:flex; gap:10px; justify-content:center; }
+.hidden { display:none; }
 
-/* Posts */
 #posts-container { display:flex; flex-direction:column; gap:15px; margin-top:15px; }
 .post {
   padding:15px;
   border-radius:12px;
-  background: rgba(0,255,234,0.05);
-  border:1px solid #00ffea;
-  transition:0.3s;
+  background: rgba(0,255,240,0.05);
+  border:1px solid #00f0ff;
+  transition:0.2s;
 }
-.post:hover { background: rgba(0,255,234,0.15); transform:translateY(-2px); }
-.post strong { display:block; font-size:1.2em; margin-bottom:5px; color:#00ffd0; }
-.post small { color:#00ffe0; }
-.hidden { display:none; }
+.post:hover { background: rgba(0,255,240,0.15); transform: translateY(-2px); }
+.post strong { display:block; margin-bottom:5px; font-size:1.2em; color:#00fff0; }
+.post small { color:#00dfff; }
+
+.auth-buttons { display:flex; gap:10px; margin-bottom:20px; }
