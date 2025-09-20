@@ -1,84 +1,89 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const GEMINI_KEY = "AIzaSyCG1d00zLgBaFGh9J1XB3B3K5OgAM7Ker0";
-  const API_BASE = "https://api.gemini.com/v1";
+  const pages = {
+    login: document.getElementById("login-page"),
+    signup: document.getElementById("signup-page"),
+    app: document.getElementById("app-page"),
+    about: document.getElementById("about-page"),
+    settings: document.getElementById("settings-page")
+  };
 
-  const usernameInput = document.getElementById("username-input");
-  const passwordInput = document.getElementById("password-input");
-  const loginBtn = document.getElementById("login-btn");
-  const signupBtn = document.getElementById("signup-btn");
-  const postForm = document.getElementById("post-form");
-  const postBtn = document.getElementById("post-btn");
-  const skillInput = document.getElementById("skill-input");
-  const descInput = document.getElementById("desc-input");
-  const postsContainer = document.getElementById("posts-container");
-  const allSkillsTitle = document.getElementById("all-skills-title");
+  const usersKey = "skillswap-users";
+  const postsKey = "skillswap-posts";
+  let currentUser = localStorage.getItem("skillswap-currentUser") || null;
 
-  let currentUser = null;
-  let postsData = [];
-
-  async function signup(username, password){
-    try{
-      const res = await fetch(`${API_BASE}/users`,{
-        method:"POST",
-        headers:{"Content-Type":"application/json","x-api-key":GEMINI_KEY},
-        body: JSON.stringify({username,password})
-      });
-      const data = await res.json();
-      if(data.success) alert("Sign-up complete, login now");
-      else alert("Error signing up");
-    }catch(err){ console.error(err); alert("Sign-up error"); }
+  // Toggle Pages
+  function showPage(name){
+    for(const p in pages) pages[p].classList.add("hidden");
+    pages[name].classList.remove("hidden");
   }
 
-  async function login(username,password){
-    try{
-      const res = await fetch(`${API_BASE}/users/auth`,{
-        method:"POST",
-        headers:{"Content-Type":"application/json","x-api-key":GEMINI_KEY},
-        body: JSON.stringify({username,password})
-      });
-      const data = await res.json();
-      if(data.success){
-        currentUser=username;
-        document.getElementById("auth-container").classList.add("hidden");
-        postForm.classList.remove("hidden");
-        allSkillsTitle.classList.remove("hidden");
-        fetchPosts();
-      }else alert("Login failed");
-    }catch(err){ console.error(err); alert("Login error"); }
-  }
+  if(currentUser) {
+    showPage("app");
+    document.getElementById("current-user").innerText=currentUser;
+    renderPosts();
+  } else showPage("login");
 
-  signupBtn.addEventListener("click",()=>{ const u=usernameInput.value.trim(),p=passwordInput.value.trim(); if(!u||!p)return alert("Fill all fields"); signup(u,p); });
-  loginBtn.addEventListener("click",()=>{ const u=usernameInput.value.trim(),p=passwordInput.value.trim(); if(!u||!p)return alert("Fill all fields"); login(u,p); });
-
-  async function fetchPosts(){
-    try{
-      const res = await fetch(`${API_BASE}/posts?apiKey=${GEMINI_KEY}`);
-      postsData = await res.json();
-      renderPosts(postsData);
-    }catch(err){ console.error(err); }
-  }
-
-  postBtn.addEventListener("click", async ()=>{
-    const skill=skillInput.value.trim(),desc=descInput.value.trim();
-    if(!skill||!desc) return alert("Fill all fields!");
-    if(!currentUser) return alert("Login first");
-    try{
-      await fetch(`${API_BASE}/posts`,{
-        method:"POST",
-        headers:{"Content-Type":"application/json","x-api-key":GEMINI_KEY},
-        body:JSON.stringify({user:currentUser,skill,description:desc,timestamp:Date.now()})
-      });
-      skillInput.value=""; descInput.value="";
-      fetchPosts();
-    }catch(err){ console.error(err); alert("Error posting"); }
+  // Login
+  document.getElementById("login-btn").addEventListener("click",()=>{
+    const u=document.getElementById("login-username").value.trim();
+    const p=document.getElementById("login-password").value.trim();
+    const users=JSON.parse(localStorage.getItem(usersKey)||"{}");
+    if(users[u] && users[u]===p){
+      currentUser=u;
+      localStorage.setItem("skillswap-currentUser",u);
+      document.getElementById("current-user").innerText=currentUser;
+      showPage("app"); renderPosts();
+    } else alert("Login failed!");
   });
 
-  function renderPosts(posts){
-    postsContainer.innerHTML="";
+  // Signup
+  document.getElementById("signup-btn").addEventListener("click",()=>{
+    const u=document.getElementById("signup-username").value.trim();
+    const p=document.getElementById("signup-password").value.trim();
+    if(!u||!p)return alert("Fill all fields!");
+    const users=JSON.parse(localStorage.getItem(usersKey)||"{}");
+    if(users[u]) return alert("Username exists!");
+    users[u]=p;
+    localStorage.setItem(usersKey,JSON.stringify(users));
+    alert("Sign-up successful! Login now.");
+    showPage("login");
+  });
+
+  // Switch pages
+  document.getElementById("show-signup").addEventListener("click",()=>showPage("signup"));
+  document.getElementById("show-login").addEventListener("click",()=>showPage("login"));
+  document.getElementById("back-to-app").addEventListener("click",()=>showPage("app"));
+  document.getElementById("goto-settings").addEventListener("click",()=>showPage("settings"));
+  document.getElementById("back-to-app-settings").addEventListener("click",()=>showPage("app"));
+
+  // Logout
+  document.getElementById("logout-btn").addEventListener("click",logout);
+  document.getElementById("logout-settings-btn").addEventListener("click",logout);
+  function logout(){ localStorage.removeItem("skillswap-currentUser"); currentUser=null; showPage("login"); }
+
+  // Posts
+  const postBtn=document.getElementById("post-btn");
+  postBtn.addEventListener("click",()=>{
+    const skill=document.getElementById("skill-input").value.trim();
+    const desc=document.getElementById("desc-input").value.trim();
+    if(!skill||!desc) return alert("Fill all fields!");
+    const posts=JSON.parse(localStorage.getItem(postsKey)||"[]");
+    posts.push({user:currentUser, skill, description:desc, timestamp:Date.now()});
+    localStorage.setItem(postsKey,JSON.stringify(posts));
+    document.getElementById("skill-input").value="";
+    document.getElementById("desc-input").value="";
+    renderPosts();
+  });
+
+  function renderPosts(){
+    const container=document.getElementById("posts-container");
+    const posts=JSON.parse(localStorage.getItem(postsKey)||"[]");
+    container.innerHTML="";
     posts.sort((a,b)=>b.timestamp-a.timestamp).forEach(p=>{
-      const div=document.createElement("div"); div.className="post";
+      const div=document.createElement("div");
+      div.className="post";
       div.innerHTML=`<strong>${p.skill}</strong><br>${p.description}<br><small>by ${p.user}</small>`;
-      postsContainer.appendChild(div);
+      container.appendChild(div);
     });
   }
 });
