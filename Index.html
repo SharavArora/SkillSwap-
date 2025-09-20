@@ -5,23 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SkillsSwap</title>
 <link rel="stylesheet" href="styles.css">
-
-<!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-database-compat.js"></script>
 </head>
 <body>
 <div class="container">
   <h1>SkillsSwap</h1>
 
-  <div id="auth-section">
-    <button id="login-btn">Sign in with Google</button>
-    <button id="logout-btn" style="display:none;">Logout</button>
-  </div>
-
-  <div class="post-form" id="post-form" style="display:none;">
-    <input type="text" id="skill-input" placeholder="Enter a skill">
+  <div class="post-form">
+    <input type="text" id="user-input" placeholder="Your Name or Handle">
+    <input type="text" id="skill-input" placeholder="Skill you offer">
     <input type="text" id="desc-input" placeholder="Describe what you offer or want">
     <button id="post-btn">Post Skill</button>
   </div>

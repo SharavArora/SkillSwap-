@@ -1,102 +1,92 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Firebase config
-  const firebaseConfig = {
-    apiKey: "AIzaSyCG1d00zLgBaFGh9J1XB3B3K5OgAM7Ker0",
-    authDomain: "skillswap-3f096.firebaseapp.com",
-    databaseURL: "https://skillswap-3f096-default-rtdb.asia-southeast1.firebasedatabase.app/",
-    projectId: "skillswap-3f096",
-    storageBucket: "skillswap-3f096.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
-  };
+  const GEMINI_KEY = "AIzaSyCG1d00zLgBaFGh9J1XB3B3K5OgAM7Ker0"; // Use wisely
+  const API_BASE = "https://api.gemini.com/v1"; // Replace with actual Gemini endpoint
 
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.database();
-
-  // DOM elements
-  const loginBtn = document.getElementById("login-btn");
-  const logoutBtn = document.getElementById("logout-btn");
-  const postForm = document.getElementById("post-form");
-  const postBtn = document.getElementById("post-btn");
+  const userInput = document.getElementById("user-input");
   const skillInput = document.getElementById("skill-input");
   const descInput = document.getElementById("desc-input");
+  const postBtn = document.getElementById("post-btn");
   const postsContainer = document.getElementById("posts-container");
   const searchInput = document.getElementById("search-input");
 
   let postsData = [];
 
-  // Login / Logout
-  loginBtn.addEventListener("click", () => {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    auth.signInWithPopup(provider).catch(err => alert(err.message));
-  });
-
-  logoutBtn.addEventListener("click", () => {
-    auth.signOut().catch(err => alert(err.message));
-  });
-
-  // Auth state change
-  auth.onAuthStateChanged(user => {
-    if (user) {
-      loginBtn.style.display = "none";
-      logoutBtn.style.display = "block";
-      postForm.style.display = "flex";
-    } else {
-      loginBtn.style.display = "block";
-      logoutBtn.style.display = "none";
-      postForm.style.display = "none";
+  // Fetch posts from Gemini
+  async function fetchPosts() {
+    try {
+      const res = await fetch(`${API_BASE}/posts?apiKey=${GEMINI_KEY}`);
+      postsData = await res.json();
+      renderPosts(postsData);
+    } catch (err) {
+      console.error("Error fetching posts:", err);
     }
-  });
+  }
 
-  // Post skill
-  postBtn.addEventListener("click", () => {
+  // Post a new skill
+  postBtn.addEventListener("click", async () => {
+    const user = userInput.value.trim();
     const skill = skillInput.value.trim();
-    const description = descInput.value.trim();
-    const user = auth.currentUser;
+    const desc = descInput.value.trim();
 
-    if (!skill || !description) return alert("Please fill both fields.");
-    if (!user) return alert("You must be signed in!");
+    if (!user || !skill || !desc) return alert("Please fill all fields!");
 
     const newPost = {
+      user,
       skill,
-      description,
-      userId: user.uid,
-      userName: user.displayName,
+      description: desc,
       timestamp: Date.now()
     };
 
-    db.ref("posts").push(newPost);
+    try {
+      await fetch(`${API_BASE}/posts`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": GEMINI_KEY
+        },
+        body: JSON.stringify(newPost)
+      });
 
-    skillInput.value = "";
-    descInput.value = "";
+      // Clear inputs
+      userInput.value = "";
+      skillInput.value = "";
+      descInput.value = "";
+
+      // Refresh posts
+      fetchPosts();
+    } catch (err) {
+      console.error("Error posting skill:", err);
+    }
   });
 
-  // Real-time posts listener
-  db.ref("posts").orderByChild("timestamp").on("value", snapshot => {
-    postsData = [];
-    snapshot.forEach(child => postsData.push(child.val()));
-    renderPosts(postsData);
-  });
-
-  // Render posts function
+  // Render posts in newest-first order
   function renderPosts(posts) {
     postsContainer.innerHTML = "";
-    posts.slice().reverse().forEach(post => {
-      const div = document.createElement("div");
-      div.className = "post";
-      div.innerHTML = `<strong>${post.skill}</strong><br>${post.description}<br><small>by ${post.userName}</small>`;
-      postsContainer.appendChild(div);
-    });
+    posts
+      .sort((a, b) => b.timestamp - a.timestamp)
+      .forEach(post => {
+        const div = document.createElement("div");
+        div.className = "post";
+        div.innerHTML = `
+          <strong>${post.skill}</strong><br>
+          ${post.description}<br>
+          <small>by ${post.user}</small>
+        `;
+        postsContainer.appendChild(div);
+      });
   }
 
-  // Search functionality
+  // Search posts dynamically
   searchInput.addEventListener("input", () => {
     const query = searchInput.value.toLowerCase();
     const filtered = postsData.filter(post =>
       post.skill.toLowerCase().includes(query) ||
-      post.description.toLowerCase().includes(query)
+      post.description.toLowerCase().includes(query) ||
+      post.user.toLowerCase().includes(query)
     );
     renderPosts(filtered);
   });
+
+  // Initial fetch
+  fetchPosts();
 });
