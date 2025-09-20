@@ -1,41 +1,56 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const GEMINI_KEY = "AIzaSyCG1d00zLgBaFGh9J1XB3B3K5OgAM7Ker0"; // Use wisely
-  const API_BASE = "https://api.gemini.com/v1"; // Replace with actual Gemini endpoint
+  const GEMINI_KEY = "AIzaSyCG1d00zLgBaFGh9J1XB3B3K5OgAM7Ker0";
+  const API_BASE = "https://api.gemini.com/v1"; // replace with your actual endpoint
 
-  const userInput = document.getElementById("user-input");
+  const usernameInput = document.getElementById("username-input");
+  const loginBtn = document.getElementById("login-btn");
+  const postForm = document.getElementById("post-form");
+  const searchContainer = document.getElementById("search-container");
+  const allSkillsTitle = document.getElementById("all-skills-title");
+
   const skillInput = document.getElementById("skill-input");
   const descInput = document.getElementById("desc-input");
   const postBtn = document.getElementById("post-btn");
   const postsContainer = document.getElementById("posts-container");
   const searchInput = document.getElementById("search-input");
 
+  let currentUser = null;
   let postsData = [];
 
-  // Fetch posts from Gemini
+  // Login function
+  loginBtn.addEventListener("click", () => {
+    const username = usernameInput.value.trim();
+    if (!username) return alert("Enter your name or handle!");
+    currentUser = username;
+
+    // Hide auth, show post/search
+    document.querySelector(".auth-container").classList.add("hidden");
+    postForm.classList.remove("hidden");
+    searchContainer.classList.remove("hidden");
+    allSkillsTitle.classList.remove("hidden");
+
+    fetchPosts();
+  });
+
+  // Fetch posts
   async function fetchPosts() {
     try {
       const res = await fetch(`${API_BASE}/posts?apiKey=${GEMINI_KEY}`);
       postsData = await res.json();
       renderPosts(postsData);
     } catch (err) {
-      console.error("Error fetching posts:", err);
+      console.error("Fetch error:", err);
     }
   }
 
-  // Post a new skill
+  // Post skill
   postBtn.addEventListener("click", async () => {
-    const user = userInput.value.trim();
     const skill = skillInput.value.trim();
     const desc = descInput.value.trim();
+    if (!skill || !desc) return alert("Fill all fields!");
+    if (!currentUser) return alert("You must login!");
 
-    if (!user || !skill || !desc) return alert("Please fill all fields!");
-
-    const newPost = {
-      user,
-      skill,
-      description: desc,
-      timestamp: Date.now()
-    };
+    const newPost = { user: currentUser, skill, description: desc, timestamp: Date.now() };
 
     try {
       await fetch(`${API_BASE}/posts`, {
@@ -47,36 +62,26 @@ document.addEventListener("DOMContentLoaded", () => {
         body: JSON.stringify(newPost)
       });
 
-      // Clear inputs
-      userInput.value = "";
       skillInput.value = "";
       descInput.value = "";
-
-      // Refresh posts
-      fetchPosts();
+      fetchPosts(); // Refresh
     } catch (err) {
-      console.error("Error posting skill:", err);
+      console.error("Post error:", err);
     }
   });
 
-  // Render posts in newest-first order
+  // Render posts
   function renderPosts(posts) {
     postsContainer.innerHTML = "";
-    posts
-      .sort((a, b) => b.timestamp - a.timestamp)
-      .forEach(post => {
-        const div = document.createElement("div");
-        div.className = "post";
-        div.innerHTML = `
-          <strong>${post.skill}</strong><br>
-          ${post.description}<br>
-          <small>by ${post.user}</small>
-        `;
-        postsContainer.appendChild(div);
-      });
+    posts.sort((a,b) => b.timestamp - a.timestamp).forEach(post => {
+      const div = document.createElement("div");
+      div.className = "post";
+      div.innerHTML = `<strong>${post.skill}</strong><br>${post.description}<br><small>by ${post.user}</small>`;
+      postsContainer.appendChild(div);
+    });
   }
 
-  // Search posts dynamically
+  // Search posts
   searchInput.addEventListener("input", () => {
     const query = searchInput.value.toLowerCase();
     const filtered = postsData.filter(post =>
@@ -86,7 +91,4 @@ document.addEventListener("DOMContentLoaded", () => {
     );
     renderPosts(filtered);
   });
-
-  // Initial fetch
-  fetchPosts();
 });
