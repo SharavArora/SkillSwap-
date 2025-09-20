@@ -1,105 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skill Swap Board</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillsSwap</title>
+<link rel="stylesheet" href="styles.css">
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-database-compat.js"></script>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🔄 Skill Swap Board</h1>
-            <p>Trade skills with others in your community</p>
-        </div>
+<div class="container">
+  <h1>SkillsSwap</h1>
 
-        <div id="authContainer" class="auth-container">
-            <div id="loginForm">
-                <h2>Sign In</h2>
-                <form class="auth-form">
-                    <div class="form-group">
-                        <label for="loginEmail">Email</label>
-                        <input type="email" id="loginEmail" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="loginPassword">Password</label>
-                        <input type="password" id="loginPassword" required>
-                    </div>
-                    <button type="submit" class="btn">Sign In</button>
-                </form>
-                <div class="toggle-auth">
-                    Don't have an account? <a id="showSignup">Sign up here</a>
-                </div>
-            </div>
+  <div id="auth-section">
+    <button id="login-btn">Sign in with Google</button>
+    <button id="logout-btn" style="display:none;">Logout</button>
+  </div>
 
-            <div id="signupForm" class="hidden">
-                <h2>Create Account</h2>
-                <form class="auth-form">
-                    <div class="form-group">
-                        <label for="signupEmail">Email</label>
-                        <input type="email" id="signupEmail" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="signupPassword">Password</label>
-                        <input type="password" id="signupPassword" minlength="6" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="confirmPassword">Confirm Password</label>
-                        <input type="password" id="confirmPassword" minlength="6" required>
-                    </div>
-                    <button type="submit" class="btn">Create Account</button>
-                </form>
-                <div class="toggle-auth">
-                    Already have an account? <a id="showLogin">Sign in here</a>
-                </div>
-            </div>
-        </div>
+  <div class="post-form" id="post-form" style="display:none;">
+    <input type="text" id="skill-input" placeholder="Enter a skill">
+    <input type="text" id="desc-input" placeholder="Describe what you offer or want">
+    <button id="post-btn">Post Skill</button>
+  </div>
 
-        <div id="appContainer" class="app-container hidden">
-            <div id="welcomeMessage" class="welcome-message hidden">
-                <h3>🎉 Welcome to Skill Swap Board!</h3>
-                <p>Start by posting a skill you'd like to offer or request.</p>
-            </div>
+  <h2>All Skills</h2>
+  <div id="posts-container"></div>
+</div>
 
-            <div class="user-info">
-                <div>
-                    <strong id="userEmail"></strong>
-                    <div class="post-counter">
-                        Posts today: <span id="postCount">0</span>/100
-                    </div>
-                </div>
-                <button id="logoutBtn" class="btn btn-secondary">Logout</button>
-            </div>
-
-            <div class="post-form">
-                <h3>Create New Skill Swap Post</h3>
-                <form id="postForm">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="skillOffered">Skill I Can Offer</label>
-                            <input type="text" id="skillOffered" placeholder="e.g., Web Development" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="skillWanted">Skill I Want to Learn</label>
-                            <input type="text" id="skillWanted" placeholder="e.g., Graphic Design" required>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="contactInfo">How to Contact You</label>
-                        <input type="text" id="contactInfo" placeholder="e.g., email@example.com or @username" required>
-                    </div>
-                    <button type="submit" class="btn">Post Skill Swap</button>
-                </form>
-            </div>
-
-            <div id="postsContainer" class="posts-container">
-                <div class="loading">Loading posts...</div>
-            </div>
-        </div>
-
-        <div id="messageContainer"></div>
-    </div>
-
-    <script src="script.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
