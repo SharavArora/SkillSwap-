@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Firebase configuration
+  // Firebase config
   const firebaseConfig = {
     apiKey: "AIzaSyCG1d00zLgBaFGh9J1XB3B3K5OgAM7Ker0",
     authDomain: "skillswap-3f096.firebaseapp.com",
@@ -23,18 +23,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const descInput = document.getElementById("desc-input");
   const postsContainer = document.getElementById("posts-container");
 
-  // Google sign-in
+  // Login / Logout
   loginBtn.addEventListener("click", () => {
     const provider = new firebase.auth.GoogleAuthProvider();
     auth.signInWithPopup(provider).catch(err => alert(err.message));
   });
 
-  // Logout
   logoutBtn.addEventListener("click", () => {
     auth.signOut().catch(err => alert(err.message));
   });
 
-  // Auth state listener
+  // Auth state change
   auth.onAuthStateChanged(user => {
     if (user) {
       loginBtn.style.display = "none";
@@ -52,9 +51,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const skill = skillInput.value.trim();
     const description = descInput.value.trim();
     const user = auth.currentUser;
-
-    if (!skill || !description) return alert("Please fill both fields.");
-    if (!user) return alert("You must be signed in!");
+    if (!skill || !description) return alert("Fill both fields!");
+    if (!user) return alert("You must be logged in!");
 
     db.ref("posts").push({
       skill,
@@ -76,8 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const div = document.createElement("div");
       div.className = "post";
       div.innerHTML = `<strong>${post.skill}</strong><br>${post.description}<br><small>by ${post.userName}</small>`;
-      postsContainer.prepend(div); // newest first
+      postsContainer.prepend(div);
     });
   });
 });
-

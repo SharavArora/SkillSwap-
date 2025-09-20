@@ -10,7 +10,6 @@ body {
   margin: auto;
 }
 
-/* Buttons */
 #login-btn, #logout-btn, .post-form button {
   padding: 10px 20px;
   border: none;
@@ -20,46 +19,16 @@ body {
   margin-bottom: 15px;
 }
 
-#login-btn, #logout-btn {
-  background-color: #007bff;
-}
+#login-btn, #logout-btn { background-color: #007bff; }
+#login-btn:hover, #logout-btn:hover { background-color: #0056b3; }
 
-#login-btn:hover, #logout-btn:hover {
-  background-color: #0056b3;
-}
+.post-form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+.post-form input { padding: 10px; border-radius: 5px; border: 1px solid #ccc; }
+.post-form button { background-color: #28a745; }
+.post-form button:hover { background-color: #218838; }
 
-.post-form button {
-  background-color: #28a745;
-}
+#posts-container { display: flex; flex-direction: column; gap: 12px; }
 
-.post-form button:hover {
-  background-color: #218838;
-}
-
-/* Post form */
-.post-form {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.post-form input {
-  padding: 10px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-/* Posts container */
-#posts-container {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-/* Single post */
 .post {
   padding: 15px;
   border-radius: 8px;
@@ -69,9 +38,4 @@ body {
   white-space: pre-wrap;
 }
 
-/* Post title */
-.post strong {
-  display: block;
-  margin-bottom: 5px;
-  font-size: 1.1em;
-}
+.post strong { display: block; margin-bottom: 5px; font-size: 1.1em; }
